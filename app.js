@@ -1,24 +1,24 @@
-const express = require("express");
-const jwt = require("jsonwebtoken");
-const session = require("express-session");
-const path = require("path");
-const mongoose = require("mongoose");
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const session = require('express-session');
+const path = require('path');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = SECRET_250929;
 
-mongoose.set("strictQuery", false);
+mongoose.set('strictQuery', false);
 
 const uri = DB_USER;
-mongoose.connect(uri, { dbName: "USERS_DB" });
+mongoose.connect(uri, { dbName: 'USERS_DB' });
 
-const User = mongoose.model("User", {
+const User = mongoose.model('User', {
   username: String,
   email: String,
   password: String,
 });
-const Post = mongoose.model("Post", {
+const Post = mongoose.model('Post', {
   userId: mongoose.Schema.Types.ObjectId,
   text: String,
 });
@@ -40,7 +40,7 @@ function authenticateJWT(req, res, next) {
   const token = req.session.token;
 
   // If no token, return 401 Unauthorized
-  if (!token) return res.status(401).json({ message: "Unauthorized" });
+  if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
   try {
     // Verify token
@@ -53,7 +53,7 @@ function authenticateJWT(req, res, next) {
     next();
   } catch (error) {
     // If invalid token, return 401
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: 'Invalid token' });
   }
 }
 
@@ -63,7 +63,7 @@ function requireAuth(req, res, next) {
   const token = req.session.token;
 
   // If no token, redirect to login page
-  if (!token) return res.redirect("/login");
+  if (!token) return res.redirect('/login');
 
   try {
     // Verify the token using the secret key
@@ -74,15 +74,91 @@ function requireAuth(req, res, next) {
     next();
   } catch (error) {
     // If token is invalid, redirect to login page
-    return res.redirect("/login");
+    return res.redirect('/login');
   }
 }
 
 // Insert your routing HTML code here.
+app.get('/', (req, res) =>
+  res.sendfile(path.join(__dirname, 'public', 'index.html'))
+);
+app.get('/register', (req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'register.html'))
+);
+app.get('/login', (req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'login.html'))
+);
+app.get('/post', requireAuth, (req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'post.html'))
+);
+app.get('/index', requireAuth, (req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
+);
 
 // Insert your user registration code here.
+app.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    // Check if the user already exists
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+
+    if (existingUser)
+      return res.status(400).json({ message: 'User already exists.' });
+
+    // Create and save the new user
+    const newUser = new User({ username, email, password });
+    await newUser.save();
+
+    // Generate JWT and store in session
+    const token = jwt.sign(
+      {
+        userId: newUser._id,
+        username: newUser.username,
+      },
+      SECRET_KEY,
+      { expiresIn: '1h' }
+    );
+    req.session.token = token;
+
+    // Respond with success message
+    res.send({ message: `The user ${username} has been added.` });
+  } catch (error) {
+    console.error(error);
+    // Handle server errors
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+});
 
 // Insert your user login code here.
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if the user exists with the provided creds
+    const user = await User.findOne({ username, password });
+
+    if (!user)
+      return res.status(401).json({ message: 'Invalid username or password.' });
+
+    // Generate JWT and store in session
+    const token = jwt.sign(
+      {
+        userID: user._id,
+        username: user.username,
+      },
+      SECRET_KEY,
+      { expiresIn: '1h' }
+    );
+    req.session.token = token;
+
+    // Respond with a success message
+    res.send({ message: `${user.username} has logged in` });
+  } catch (error) {
+    // Handle server errors
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // Insert your post creation code here.
 
