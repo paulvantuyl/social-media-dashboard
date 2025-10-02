@@ -161,6 +161,40 @@ app.post('/login', async (req, res) => {
 });
 
 // Insert your post creation code here.
+app.post('/post', authenticateJWT, async (req, res) => {
+  const { text } = req.body;
+
+  // Validate post content
+  if (!text || typeof text !== 'string') {
+    return res
+      .status(400)
+      .json({ message: 'Please provide valid post content.' });
+  }
+
+  try {
+    // Create and save new post with userId
+    const newPost = new Post({ userId: req.user.userId, text });
+    await newPost.save();
+    res
+      .status(201)
+      .json({ message: 'Post created successfully', post: newPost });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get all posts for the authenticated user
+app.get('/posts', authenticateJWT, async (req, res) => {
+  try {
+    // Fetch posts for the logged in user
+    const posts = await Post.find({ userId: req.user.userId });
+    res.json({ posts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // Insert your post updation code here.
 
