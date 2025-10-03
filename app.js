@@ -6,12 +6,12 @@ const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SECRET_KEY = SECRET_250929;
+const SECRET_KEY = process.env.SECRET_250929;
 
 mongoose.set('strictQuery', false);
 
-const uri = DB_USER;
-mongoose.connect(uri, { dbName: 'USERS_DB' });
+const uri = process.env.DB_USER;
+mongoose.connect(uri, { dbName: 'process.env.USERS_DB' });
 
 const User = mongoose.model('User', {
   username: String,
@@ -225,12 +225,15 @@ app.delete('/posts:/postId', authenticateJWT, async (req, res) => {
 
   try {
     // Find and delete the post; ensure it's owned by authenticated user
-    const post = await Post.findOneAndDelete({ _id: postId, userId: req.user.userId });
+    const post = await Post.findOneAndDelete({
+      _id: postId,
+      userId: req.user.userId,
+    });
 
     // Return error if post not found
     if (!post) return res.status(404).json({ message: 'Post not found' });
 
-    res.json({ message 'Post deleted successfully', deletedPost: post });
+    res.json({ message: 'Post deleted successfully', deletedPost: post });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
