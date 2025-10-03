@@ -220,7 +220,31 @@ app.put('/post/:postId', authenticateJWT, async (req, res) => {
 });
 
 // Insert your post deletion code here.
+app.delete('/posts:/postId', authenticateJWT, async (req, res) => {
+  const postId = req.params.postId;
+
+  try {
+    // Find and delete the post; ensure it's owned by authenticated user
+    const post = await Post.findOneAndDelete({ _id: postId, userId: req.user.userId });
+
+    // Return error if post not found
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    res.json({ message 'Post deleted successfully', deletedPost: post });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // Insert your user logout code here.
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    // Log any session destruction errors
+    if (err) console.error(err);
+    // Redirect to login page after logout
+    res.redirect('/login');
+  });
+});
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
