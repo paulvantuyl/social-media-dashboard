@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const path = require('path');
 const mongoose = require('mongoose');
+const MongoClient = require('mongodb').MongoClient;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,14 +11,18 @@ const SECRET_KEY = process.env.SECRET_250929;
 
 mongoose.set('strictQuery', false);
 
-const uri = process.env.DB_USER;
-mongoose.connect(uri, { dbName: 'process.env.USERS_DB' });
+const dbURI = process.env.DB_USER;
+mongoose
+  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Database connected.'))
+  .catch((err) => console.error('Connection error:', err));
 
 const User = mongoose.model('User', {
   username: String,
   email: String,
   password: String,
 });
+
 const Post = mongoose.model('Post', {
   userId: mongoose.Schema.Types.ObjectId,
   text: String,
