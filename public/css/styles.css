@@ -11,20 +11,22 @@ header {
   background-color: #0077cc;
   color: #ffffff;
   text-align: right;
-  padding: 20px;
+  padding: 0 20px 20px;
 }
 
 h1 {
   color: #333333;
   font-size: 2.5em;
   margin-bottom: 20px;
-  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
 }
 
 p {
-  color: #555555;
+  color: #333333;
   font-size: 1.2em;
+  margin-top: 20px;
 }
+
+p a:hover { text-decoration: underline }
 
 .app-names {
   display: flex;
@@ -43,17 +45,19 @@ p {
 }
 
 .button-link {
-  margin-top: 30px;
-  padding: 15px 30px;
+  margin-top: 20px;
+  padding: 10px 20px;
   font-size: 1.2em;
-  border: 2px solid #0099ff;
+  border: none;
   border-radius: 8px;
   background-color: #ffffff;
-  color: #0099ff;
+  color: #0045ff;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
 }
+
+.button-link:hover { color: #ffffff }
 
 .container {
   max-width: 400px;
@@ -62,12 +66,29 @@ p {
   background-color: #ffffff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  text-align: left;
 }
 
-.auth-form label {
+/* .auth-form label {
   display: block;
   margin-bottom: 8px;
   font-weight: bold;
+} */
+
+label,
+textarea {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.2em;
+  color: #333333;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 .auth-form input {
@@ -79,12 +100,50 @@ p {
   box-sizing: border-box;
 }
 
-/* Might not need this. */
-.auth-form button {
-  background-color: #0077cc;
+button {
+  background-color: #0045ff;
   color: #ffffff;
   padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover { 
+  background-color: #0005ff;
+  color: #ffffff;
+}
+
+.post-form,
+.post-list {
+  width: 60%;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1));
+}
+
+.post {
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-text {
+  flex-grow: 1;
+  margin-right: 10px;
+  font-size: 1.1em;
+  color: #333;
+}
+
+.pagination { margin-top: 20px }
+
+.pagination button {
+  padding: 10px;
+  margin: 0 5px;
 }
