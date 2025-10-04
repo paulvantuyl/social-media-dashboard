@@ -8,6 +8,7 @@ const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_250929;
+app.use(express.static('public/css'));
 
 mongoose.set('strictQuery', false);
 
@@ -85,7 +86,7 @@ function requireAuth(req, res, next) {
 
 // Insert your routing HTML code here.
 app.get('/', (req, res) =>
-  res.sendfile(path.join(__dirname, 'public', 'index.html'))
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
 );
 app.get('/register', (req, res) =>
   res.sendFile(path.join(__dirname, 'public', 'register.html'))
@@ -127,7 +128,9 @@ app.post('/register', async (req, res) => {
     req.session.token = token;
 
     // Respond with success message
-    res.send({ message: `The user ${username} has been added.` });
+    // res.send({ message: `The user ${username} has been added.` });
+    // Redirect to /index when successful registration with username param set
+    res.redirect(`/index?username=${newUser.username}`);
   } catch (error) {
     console.error(error);
     // Handle server errors
@@ -158,7 +161,9 @@ app.post('/login', async (req, res) => {
     req.session.token = token;
 
     // Respond with a success message
-    res.send({ message: `${user.username} has logged in` });
+    // res.send({ message: `${user.username} has logged in` });
+    // Redirect when successful login with username parameter set
+    res.redirect(`/index?username=${user.username}`);
   } catch (error) {
     // Handle server errors
     res.status(500).json({ message: 'Internal server error' });
